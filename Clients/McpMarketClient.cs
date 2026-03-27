@@ -12,13 +12,12 @@ namespace RealTimeMarketAPI.Sdk.Clients
     /// Typed MCP client that speaks the JSON-RPC + Streamable HTTP / SSE transport
     /// directly — no external MCP package required.
     /// </summary>
-    internal sealed class McpMarketClient : IMcpMarketClient
+    internal sealed class McpMarketClient(HttpClient httpClient, RealMarketApiOptions options) : IMcpMarketClient
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _apiKey;
+        private readonly string _apiKey = options.ApiKey;
 
         // Session state — lazily initialized on first call
-        private string? _sessionId;
+        private string _sessionId;
         private readonly SemaphoreSlim _initLock = new(1, 1);
 
         private static readonly JsonSerializerOptions JsonOptions =
@@ -29,12 +28,6 @@ namespace RealTimeMarketAPI.Sdk.Clients
 
         private const string McpPath = "mcp";
         private const string McpProtocolVersion = "2025-03-26";
-
-        public McpMarketClient(HttpClient httpClient, RealMarketApiOptions options)
-        {
-            _httpClient = httpClient;
-            _apiKey = options.ApiKey;
-        }
 
         // ── Market data ────────────────────────────────────────────────────────
 
@@ -250,7 +243,7 @@ namespace RealTimeMarketAPI.Sdk.Clients
             }
         }
 
-        private async Task<HttpResponseMessage> PostMcpAsync(object message, string? sessionId, CancellationToken ct)
+        private async Task<HttpResponseMessage> PostMcpAsync(object message, string sessionId, CancellationToken ct)
         {
             var json = JsonSerializer.Serialize(message, RequestOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -263,7 +256,7 @@ namespace RealTimeMarketAPI.Sdk.Clients
             if (sessionId is not null)
                 request.Headers.TryAddWithoutValidation("Mcp-Session-Id", sessionId);
 
-            return await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, ct);
+            return await httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, ct);
         }
 
         // ── SSE / JSON body parser ─────────────────────────────────────────────

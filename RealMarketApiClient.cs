@@ -6,30 +6,21 @@ namespace RealTimeMarketAPI.Sdk
     /// Default implementation of <see cref="IRealMarketApiClient"/>.
     /// Register via <c>services.AddRealMarketApiClient("your-api-key")</c>.
     /// </summary>
-    public sealed class RealMarketApiClient : IRealMarketApiClient
+    public sealed class RealMarketApiClient(HttpClient httpClient, RealMarketApiOptions options) : IRealMarketApiClient
     {
         /// <inheritdoc/>
-        public ITickerClient Ticker { get; }
+        public ITickerClient Ticker { get; } = new TickerClient(httpClient, options.ApiKey);
 
         /// <inheritdoc/>
-        public IIndicatorClient Indicators { get; }
+        public IIndicatorClient Indicators { get; } = new IndicatorClient(httpClient, options.ApiKey);
 
         /// <inheritdoc/>
-        public ISymbolClient Symbols { get; }
+        public ISymbolClient Symbols { get; } = new SymbolClient(httpClient);
 
         /// <inheritdoc/>
-        public IWebSocketClient WebSocket { get; }
+        public IWebSocketClient WebSocket { get; } = new WebSocketClient(options);
 
         /// <inheritdoc/>
-        public IMcpMarketClient Mcp { get; }
-
-        public RealMarketApiClient(HttpClient httpClient, RealMarketApiOptions options)
-        {
-            Ticker = new TickerClient(httpClient, options.ApiKey);
-            Indicators = new IndicatorClient(httpClient, options.ApiKey);
-            Symbols = new SymbolClient(httpClient);
-            WebSocket = new WebSocketClient(options);
-            Mcp = new McpMarketClient(httpClient, options);
-        }
+        public IMcpMarketClient Mcp { get; } = new McpMarketClient(httpClient, options);
     }
 }
