@@ -373,3 +373,4 @@ ffprobe.exe
 /sources/RealTimeMarketAPI.Services/appsettings.json
 /sources/RealTimeMarketAPI.WebApis/appsettings.Deployment.json
 /sources/RealTimeMarketAPI.Services/appsettings.Deployment.json
+/Build.md
