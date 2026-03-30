@@ -167,6 +167,88 @@ namespace RealTimeMarketAPI.Sdk.Clients
             return ToListResult(items);
         }
 
+        public async Task<ListResult<BollingerBandPoint>> GetBollingerBandsAsync(string symbolCode, string timeFrame, int period = 20, decimal multiplier = 2m, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<BollingerBandPoint>>("get_bollinger_bands", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period,
+                multiplier
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<StochasticPoint>> GetStochasticAsync(string symbolCode, string timeFrame, int kPeriod = 14, int dPeriod = 3, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<StochasticPoint>>("get_stochastic", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                kPeriod,
+                dPeriod
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<IndicatorPoint>> GetAtrAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<IndicatorPoint>>("get_atr", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<IndicatorPoint>> GetCciAsync(string symbolCode, string timeFrame, int period = 20, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<IndicatorPoint>>("get_cci", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<IndicatorPoint>> GetWilliamsRAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<IndicatorPoint>>("get_williams_r", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<AdxPoint>> GetAdxAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<AdxPoint>>("get_adx", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public Task<SentimentResult> GetSentimentAsync(string symbolCode, string timeFrame, CancellationToken ct = default)
+            => CallToolAsync<SentimentResult>("get_sentiment", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey
+            }, ct);
+
         // ── MCP protocol core ──────────────────────────────────────────────────
 
         /// <summary>

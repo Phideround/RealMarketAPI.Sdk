@@ -97,5 +97,104 @@ namespace RealTimeMarketAPI.Sdk.Clients
             var result = await httpClient.GetFromJsonAsync<ListResult<FibonacciLevel>>($"api/v1/indicator/fibonacci?{query}", JsonOptions, ct);
             return result!;
         }
+
+        public async Task<ListResult<BollingerBandPoint>> GetBollingerBandsAsync(string symbolCode, string timeFrame, int period = 20, decimal multiplier = 2m, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame,
+                ["period"] = period.ToString(),
+                ["multiplier"] = multiplier.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<BollingerBandPoint>>($"api/v1/indicator/bollinger-bands?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<ListResult<StochasticPoint>> GetStochasticAsync(string symbolCode, string timeFrame, int kPeriod = 14, int dPeriod = 3, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame,
+                ["kPeriod"] = kPeriod.ToString(),
+                ["dPeriod"] = dPeriod.ToString()
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<StochasticPoint>>($"api/v1/indicator/stochastic?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<ListResult<IndicatorPoint>> GetAtrAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame,
+                ["period"] = period.ToString()
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<IndicatorPoint>>($"api/v1/indicator/atr?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<ListResult<IndicatorPoint>> GetCciAsync(string symbolCode, string timeFrame, int period = 20, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame,
+                ["period"] = period.ToString()
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<IndicatorPoint>>($"api/v1/indicator/cci?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<ListResult<IndicatorPoint>> GetWilliamsRAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame,
+                ["period"] = period.ToString()
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<IndicatorPoint>>($"api/v1/indicator/williams-r?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<ListResult<AdxPoint>> GetAdxAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame,
+                ["period"] = period.ToString()
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<AdxPoint>>($"api/v1/indicator/adx?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<SentimentResult> GetSentimentAsync(string symbolCode, string timeFrame, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["symbolCode"] = symbolCode,
+                ["timeFrame"] = timeFrame
+            });
+
+            var result = await httpClient.GetFromJsonAsync<SentimentResult>($"api/v1/indicator/sentiment?{query}", JsonOptions, ct);
+            return result!;
+        }
     }
 }

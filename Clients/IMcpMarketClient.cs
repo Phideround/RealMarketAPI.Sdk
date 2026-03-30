@@ -57,5 +57,26 @@ namespace RealTimeMarketAPI.Sdk.Clients
 
         /// <summary>Fibonacci retracement and extension levels. MCP tool: <c>get_fibonacci</c></summary>
         Task<ListResult<FibonacciLevel>> GetFibonacciAsync(string symbolCode, string timeFrame, int lookback = 100, CancellationToken ct = default);
+
+        /// <summary>Bollinger Bands (upper, middle, lower). MCP tool: <c>get_bollinger_bands</c></summary>
+        Task<ListResult<BollingerBandPoint>> GetBollingerBandsAsync(string symbolCode, string timeFrame, int period = 20, decimal multiplier = 2m, CancellationToken ct = default);
+
+        /// <summary>Stochastic Oscillator (%K and %D lines). MCP tool: <c>get_stochastic</c></summary>
+        Task<ListResult<StochasticPoint>> GetStochasticAsync(string symbolCode, string timeFrame, int kPeriod = 14, int dPeriod = 3, CancellationToken ct = default);
+
+        /// <summary>Average True Range (ATR). MCP tool: <c>get_atr</c></summary>
+        Task<ListResult<IndicatorPoint>> GetAtrAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default);
+
+        /// <summary>Commodity Channel Index (CCI). MCP tool: <c>get_cci</c></summary>
+        Task<ListResult<IndicatorPoint>> GetCciAsync(string symbolCode, string timeFrame, int period = 20, CancellationToken ct = default);
+
+        /// <summary>Williams %R. MCP tool: <c>get_williams_r</c></summary>
+        Task<ListResult<IndicatorPoint>> GetWilliamsRAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default);
+
+        /// <summary>Average Directional Index (ADX) with +DI and -DI. MCP tool: <c>get_adx</c></summary>
+        Task<ListResult<AdxPoint>> GetAdxAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default);
+
+        /// <summary>Market sentiment (trend, fear/greed score, key indicators). MCP tool: <c>get_sentiment</c></summary>
+        Task<SentimentResult> GetSentimentAsync(string symbolCode, string timeFrame, CancellationToken ct = default);
     }
 }

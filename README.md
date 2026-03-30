@@ -88,8 +88,15 @@ public class MarketService(IRealMarketApiClient client)
 | `GetEmaAsync(symbol, timeframe, period)` | Exponential Moving Average |
 | `GetRsiAsync(symbol, timeframe, period=14)` | Relative Strength Index |
 | `GetMacdAsync(symbol, timeframe, fast=12, slow=26, signal=9)` | MACD line, signal, and histogram |
+| `GetBollingerBandsAsync(symbol, timeframe, period=20, multiplier=2)` | Bollinger Bands (upper, middle, lower) |
+| `GetStochasticAsync(symbol, timeframe, kPeriod=14, dPeriod=3)` | Stochastic Oscillator (%K and %D) |
+| `GetAtrAsync(symbol, timeframe, period=14)` | Average True Range |
+| `GetCciAsync(symbol, timeframe, period=20)` | Commodity Channel Index |
+| `GetWilliamsRAsync(symbol, timeframe, period=14)` | Williams %R |
+| `GetAdxAsync(symbol, timeframe, period=14)` | Average Directional Index (+DI, -DI) |
 | `GetSupportResistanceAsync(symbol, timeframe)` | Support and resistance levels |
 | `GetFibonacciAsync(symbol, timeframe, lookback=100)` | Fibonacci retracement levels |
+| `GetSentimentAsync(symbol, timeframe)` | Market sentiment (trend, fear/greed score) |
 
 ### Symbols (`client.Symbols`)
 
@@ -122,8 +129,15 @@ Endpoint: `https://api.realmarketapi.com/mcp`
 | `GetEmaAsync(symbol, timeframe, period=20)` | `get_ema` | Exponential Moving Average |
 | `GetRsiAsync(symbol, timeframe, period=14)` | `get_rsi` | Relative Strength Index |
 | `GetMacdAsync(symbol, timeframe, fast=12, slow=26, signal=9)` | `get_macd` | MACD line, signal, and histogram |
+| `GetBollingerBandsAsync(symbol, timeframe, period=20, multiplier=2)` | `get_bollinger_bands` | Bollinger Bands (upper, middle, lower) |
+| `GetStochasticAsync(symbol, timeframe, kPeriod=14, dPeriod=3)` | `get_stochastic` | Stochastic Oscillator (%K and %D) |
+| `GetAtrAsync(symbol, timeframe, period=14)` | `get_atr` | Average True Range |
+| `GetCciAsync(symbol, timeframe, period=20)` | `get_cci` | Commodity Channel Index |
+| `GetWilliamsRAsync(symbol, timeframe, period=14)` | `get_williams_r` | Williams %R |
+| `GetAdxAsync(symbol, timeframe, period=14)` | `get_adx` | Average Directional Index (+DI, -DI) |
 | `GetSupportResistanceAsync(symbol, timeframe)` | `get_support_resistance` | Support and resistance levels |
 | `GetFibonacciAsync(symbol, timeframe, lookback=100)` | `get_fibonacci` | Fibonacci retracement and extension levels |
+| `GetSentimentAsync(symbol, timeframe)` | `get_sentiment` | Market sentiment (trend, fear/greed score) |
 
 > Indicator MCP tools require a **Pro** plan or higher.
 
