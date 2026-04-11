@@ -2,6 +2,7 @@ using RealTimeMarketAPI.Sdk.Models.Common;
 using RealTimeMarketAPI.Sdk.Models.Indicator;
 using RealTimeMarketAPI.Sdk.Models.Symbol;
 using RealTimeMarketAPI.Sdk.Models.Ticker;
+using RealTimeMarketAPI.Sdk.Models.Volatility;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -248,6 +249,44 @@ namespace RealTimeMarketAPI.Sdk.Clients
                 timeFrame,
                 apiKey = _apiKey
             }, ct);
+
+        // ── Volatility ─────────────────────────────────────────────────────────
+
+        public async Task<ListResult<VolatilityPoint>> GetVolatilityAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<VolatilityPoint>>("get_volatility", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<VolatilitySpikePoint>> GetVolatilitySpikesAsync(string symbolCode, string timeFrame, int period = 14, decimal spikeMultiplier = 2.0m, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<VolatilitySpikePoint>>("get_volatility_spikes", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey,
+                period,
+                spikeMultiplier
+            }, ct);
+            return ToListResult(items);
+        }
+
+        public async Task<ListResult<VolatilityHeatmapPoint>> GetVolatilityHeatmapAsync(string symbolCode, string timeFrame, CancellationToken ct = default)
+        {
+            var items = await CallToolAsync<List<VolatilityHeatmapPoint>>("get_volatility_heatmap", new
+            {
+                symbolCode,
+                timeFrame,
+                apiKey = _apiKey
+            }, ct);
+            return ToListResult(items);
+        }
 
         // ── MCP protocol core ──────────────────────────────────────────────────
 

@@ -18,6 +18,9 @@ namespace RealTimeMarketAPI.Sdk
         public ISymbolClient Symbols { get; } = new SymbolClient(httpClient);
 
         /// <inheritdoc/>
+        public IVolatilityClient Volatility { get; } = new VolatilityClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
         public IWebSocketClient WebSocket { get; } = new WebSocketClient(options);
 
         /// <inheritdoc/>

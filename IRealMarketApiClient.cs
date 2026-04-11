@@ -16,6 +16,9 @@ namespace RealTimeMarketAPI.Sdk
         /// <summary>Access available trading symbols via REST.</summary>
         ISymbolClient Symbols { get; }
 
+        /// <summary>Access volatility metrics, spike detection, and heatmap via REST.</summary>
+        IVolatilityClient Volatility { get; }
+
         /// <summary>
         /// Stream real-time price ticks over a persistent WebSocket connection.
         /// <para>Requires a plan with WebSocket support enabled.</para>

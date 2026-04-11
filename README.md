@@ -104,6 +104,16 @@ public class MarketService(IRealMarketApiClient client)
 |--------|-------------|
 | `GetSymbolsAsync()` | All available trading symbols for your plan |
 
+### Volatility (`client.Volatility`)
+
+| Method | Description |
+|--------|-------------|
+| `GetVolatilityAsync(symbol, timeframe, period=14)` | Time-series of ATR, ATR%, Bollinger Band Width, and Historical Volatility |
+| `GetSpikesAsync(symbol, timeframe, period=14, spikeMultiplier=2.0)` | Candles where ATR exceeded a multiple of the series average |
+| `GetHeatmapAsync(symbol, timeframe)` | Day-of-Week × Hour-of-Day average true range heatmap |
+
+> Available on Starter plan and above. Free plan is not supported.
+
 ### WebSocket (`client.WebSocket`)
 
 | Method | Description |
@@ -138,12 +148,17 @@ Endpoint: `https://api.realmarketapi.com/mcp`
 | `GetSupportResistanceAsync(symbol, timeframe)` | `get_support_resistance` | Support and resistance levels |
 | `GetFibonacciAsync(symbol, timeframe, lookback=100)` | `get_fibonacci` | Fibonacci retracement and extension levels |
 | `GetSentimentAsync(symbol, timeframe)` | `get_sentiment` | Market sentiment (trend, fear/greed score) |
+| `GetVolatilityAsync(symbol, timeframe, period=14)` | `get_volatility` | Volatility time-series (ATR, ATR%, Band Width, Historical Volatility) |
+| `GetVolatilitySpikesAsync(symbol, timeframe, period=14, spikeMultiplier=2.0)` | `get_volatility_spikes` | Volatility spike candles |
+| `GetVolatilityHeatmapAsync(symbol, timeframe)` | `get_volatility_heatmap` | Day-of-Week × Hour-of-Day volatility heatmap |
 
-> Indicator MCP tools require a **Pro** plan or higher.
+> Indicator MCP tools require a **Pro** plan or higher.  
+> Volatility MCP tools require a **Starter** plan or higher.
 
 ## Notes
 
 - Indicator endpoints require a **Pro** plan or higher.
+- Volatility endpoints require a **Starter** plan or higher (Free plan not supported).
 - WebSocket streaming requires a plan with `IsSocketSupport = true`.
 - Historical data availability depends on your plan's `HistoricalRangeMonth`.
 - All methods accept an optional `CancellationToken`.

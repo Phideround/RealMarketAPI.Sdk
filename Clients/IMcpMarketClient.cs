@@ -2,6 +2,7 @@ using RealTimeMarketAPI.Sdk.Models.Common;
 using RealTimeMarketAPI.Sdk.Models.Indicator;
 using RealTimeMarketAPI.Sdk.Models.Symbol;
 using RealTimeMarketAPI.Sdk.Models.Ticker;
+using RealTimeMarketAPI.Sdk.Models.Volatility;
 
 namespace RealTimeMarketAPI.Sdk.Clients
 {
@@ -78,5 +79,16 @@ namespace RealTimeMarketAPI.Sdk.Clients
 
         /// <summary>Market sentiment (trend, fear/greed score, key indicators). MCP tool: <c>get_sentiment</c></summary>
         Task<SentimentResult> GetSentimentAsync(string symbolCode, string timeFrame, CancellationToken ct = default);
+
+        // ── Volatility ─────────────────────────────────────────────────────────
+
+        /// <summary>Volatility time-series (ATR, ATR%, Band Width, Historical Volatility). MCP tool: <c>get_volatility</c></summary>
+        Task<ListResult<VolatilityPoint>> GetVolatilityAsync(string symbolCode, string timeFrame, int period = 14, CancellationToken ct = default);
+
+        /// <summary>Volatility spike candles where ATR exceeded a multiple of the series average. MCP tool: <c>get_volatility_spikes</c></summary>
+        Task<ListResult<VolatilitySpikePoint>> GetVolatilitySpikesAsync(string symbolCode, string timeFrame, int period = 14, decimal spikeMultiplier = 2.0m, CancellationToken ct = default);
+
+        /// <summary>Day-of-Week × Hour-of-Day volatility heatmap. MCP tool: <c>get_volatility_heatmap</c></summary>
+        Task<ListResult<VolatilityHeatmapPoint>> GetVolatilityHeatmapAsync(string symbolCode, string timeFrame, CancellationToken ct = default);
     }
 }
