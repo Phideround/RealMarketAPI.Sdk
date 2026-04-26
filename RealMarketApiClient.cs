@@ -25,5 +25,26 @@ namespace RealTimeMarketAPI.Sdk
 
         /// <inheritdoc/>
         public IMcpMarketClient Mcp { get; } = new McpMarketClient(httpClient, options);
+
+        /// <inheritdoc/>
+        public IInsightClient Insight { get; } = new InsightClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IMultiTimeframeClient MultiTimeframe { get; } = new MultiTimeframeClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public ILiquidityClient Liquidity { get; } = new LiquidityClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IOrderFlowClient OrderFlow { get; } = new OrderFlowClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IStopHuntClient StopHunt { get; } = new StopHuntClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IAnomalyClient Anomaly { get; } = new AnomalyClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IManipulationClient Manipulation { get; } = new ManipulationClient(httpClient, options.ApiKey);
     }
 }

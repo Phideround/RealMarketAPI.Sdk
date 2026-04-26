@@ -31,5 +31,26 @@ namespace RealTimeMarketAPI.Sdk
         /// <para>Endpoint: <c>https://api.realmarketapi.com/mcp</c></para>
         /// </summary>
         IMcpMarketClient Mcp { get; }
+
+        /// <summary>Access Insight module endpoints: next-candle forecast, trend, setup, confluence, and score.</summary>
+        IInsightClient Insight { get; }
+
+        /// <summary>Access Multi-Timeframe module — returns trend direction across all plan-allowed timeframes in one call.</summary>
+        IMultiTimeframeClient MultiTimeframe { get; }
+
+        /// <summary>Access Liquidity module — key support/resistance clusters ordered by proximity.</summary>
+        ILiquidityClient Liquidity { get; }
+
+        /// <summary>Access Order Flow module — measures bullish/bearish candle imbalance over the last 50 candles.</summary>
+        IOrderFlowClient OrderFlow { get; }
+
+        /// <summary>Access Stop Hunt module — identifies stop-cluster zones beyond key S/R levels.</summary>
+        IStopHuntClient StopHunt { get; }
+
+        /// <summary>Access Anomaly module — scans for price spikes, unusual volume, and fake breakouts.</summary>
+        IAnomalyClient Anomaly { get; }
+
+        /// <summary>Access Manipulation Risk module — assesses manipulation probability from wick ratio, volume divergence, and fake breakouts.</summary>
+        IManipulationClient Manipulation { get; }
     }
 }

@@ -36,7 +36,7 @@ builder.Services.AddRealMarketApiClient(options =>
 ```csharp
 public class MarketService(IRealMarketApiClient client)
 {
-    public async Task PrintPriceAsync()
+    public async Task BasicExamplesAsync()
     {
         // Real-time price
         var price = await client.Ticker.GetPriceAsync("EURUSD", "M1");
@@ -58,6 +58,62 @@ public class MarketService(IRealMarketApiClient client)
 
         // Available symbols
         var symbols = await client.Symbols.GetSymbolsAsync();
+    }
+
+    public async Task InsightExamplesAsync()
+    {
+        // Next-candle forecast with bias and ATR targets
+        var next = await client.Insight.GetNextAsync("BTCUSD", "H1");
+        Console.WriteLine($"Bias: {next.Bias}  Bull: {next.BullScore}  Bear: {next.BearScore}");
+        Console.WriteLine($"Target Up: {next.TargetUp}  Target Down: {next.TargetDown}");
+
+        // Trend classification
+        var trend = await client.Insight.GetTrendAsync("EURUSD", "H4");
+        Console.WriteLine($"Trend: {trend.Trend}  ADX: {trend.Adx}");
+
+        // Market setup detection
+        var setup = await client.Insight.GetSetupAsync("XAUUSD", "M15");
+        Console.WriteLine($"Setup: {setup.Setup}  Direction: {setup.Direction}");
+
+        // Confluence signal with strength and reasons
+        var confluence = await client.Insight.GetConfluenceAsync("BTCUSD", "H1");
+        Console.WriteLine($"Signal: {confluence.Signal}  Strength: {confluence.Strength}  Score: {confluence.Score}");
+
+        // Composite 0–100 bullish/bearish score
+        var score = await client.Insight.GetScoreAsync("EURUSD", "H1");
+        Console.WriteLine($"Score: {score.Score}  Label: {score.Label}");
+    }
+
+    public async Task ProModulesExamplesAsync()
+    {
+        // Trend direction across all timeframes
+        var mtf = await client.MultiTimeframe.GetAsync("BTCUSD");
+        foreach (var (tf, direction) in mtf.Timeframes)
+            Console.WriteLine($"{tf}: {direction}");
+
+        // Liquidity zones (S/R clusters)
+        var liquidity = await client.Liquidity.GetZonesAsync("XAUUSD", "H1");
+        foreach (var zone in liquidity.Zones)
+            Console.WriteLine($"{zone.Type} @ {zone.Price}  Strength: {zone.Strength}  Touches: {zone.TouchCount}");
+
+        // Order flow imbalance
+        var imbalance = await client.OrderFlow.GetImbalanceAsync("BTCUSD", "M15");
+        Console.WriteLine($"Imbalance: {imbalance.CurrentImbalance}  Bull%: {imbalance.BullishRatio}  Bear%: {imbalance.BearishRatio}");
+
+        // Stop hunt zones
+        var stopHunt = await client.StopHunt.GetZonesAsync("EURUSD", "H1");
+        foreach (var zone in stopHunt.Zones)
+            Console.WriteLine($"{zone.Type} @ {zone.Price}  Hunted: {zone.RecentlyHunted}");
+
+        // Anomaly scan
+        var anomalies = await client.Anomaly.GetAsync("BTCUSD", "M15");
+        if (anomalies.HasAnomalies)
+            foreach (var a in anomalies.Anomalies)
+                Console.WriteLine($"{a.Type} at {a.OpenTime}: {a.Description}");
+
+        // Manipulation risk
+        var risk = await client.Manipulation.GetRiskAsync("XAUUSD", "M15");
+        Console.WriteLine($"Risk: {risk.RiskLevel}  Score: {risk.RiskScore}");
     }
 
     public async Task StreamPricesAsync(CancellationToken ct)
@@ -114,6 +170,52 @@ public class MarketService(IRealMarketApiClient client)
 
 > Available on Starter plan and above. Free plan is not supported.
 
+### Insight (`client.Insight`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetNextAsync(symbol, timeframe)` | Next-candle forecast: bias, bull/bear score, ATR-based targets, and 5 signals |
+| `GetTrendAsync(symbol, timeframe)` | Trend classification using EMA alignment and ADX strength |
+| `GetSetupAsync(symbol, timeframe)` | Market setup detection: Breakout, Pullback, Range, or None |
+| `GetConfluenceAsync(symbol, timeframe)` | Actionable signal (Buy / Sell / Neutral) with strength rating and scored reasons |
+| `GetScoreAsync(symbol, timeframe)` | Composite 0–100 bullish/bearish score from five equally-weighted components |
+
+### Multi-Timeframe (`client.MultiTimeframe`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetAsync(symbol)` | Trend direction across all plan-allowed timeframes in a single call |
+
+### Liquidity (`client.Liquidity`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetZonesAsync(symbol, timeframe)` | Key S/R clusters acting as liquidity pools, sorted nearest-first |
+
+### Order Flow (`client.OrderFlow`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetImbalanceAsync(symbol, timeframe)` | Bullish/Bearish/Neutral imbalance from last 50 candles + abnormal-body zones |
+
+### Stop Hunt (`client.StopHunt`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetZonesAsync(symbol, timeframe)` | Stop-cluster zones beyond key S/R levels; flags recently hunted levels |
+
+### Anomaly (`client.Anomaly`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetAsync(symbol, timeframe)` | Scans last 50 candles for PriceSpike, UnusualVolume, and FakeBreakout anomalies |
+
+### Manipulation Risk (`client.Manipulation`) — *Pro plan required*
+
+| Method | Description |
+|--------|-------------|
+| `GetRiskAsync(symbol, timeframe)` | Composite manipulation risk score (0–100) from wick ratio, volume divergence, and fake breakouts |
+
 ### WebSocket (`client.WebSocket`)
 
 | Method | Description |
@@ -157,8 +259,8 @@ Endpoint: `https://api.realmarketapi.com/mcp`
 
 ## Notes
 
-- Indicator endpoints require a **Pro** plan or higher.
-- Volatility endpoints require a **Starter** plan or higher (Free plan not supported).
+- **Pro plan** required for: Indicator, Insight, Multi-Timeframe, Liquidity, Order Flow, Stop Hunt, Anomaly, and Manipulation endpoints.
+- **Starter plan** required for Volatility endpoints (Free plan not supported).
 - WebSocket streaming requires a plan with `IsSocketSupport = true`.
 - Historical data availability depends on your plan's `HistoricalRangeMonth`.
 - All methods accept an optional `CancellationToken`.
