@@ -1,3 +1,5 @@
+using RealTimeMarketAPI.Sdk.Models.MultiTimeframe;
+using RealTimeMarketAPI.Sdk.Models.OrderFlow;
 using RealTimeMarketAPI.Sdk.Models.Ticker;
 
 namespace RealTimeMarketAPI.Sdk.Clients
@@ -8,17 +10,45 @@ namespace RealTimeMarketAPI.Sdk.Clients
     public interface IWebSocketClient
     {
         /// <summary>
-        /// Opens a WebSocket connection and streams real-time price ticks for a symbol
-        /// until the <paramref name="ct"/> is cancelled.
+        /// Streams real-time price ticks for a symbol.
         /// <para>Endpoint: <c>wss://api.realmarketapi.com/price</c></para>
         /// </summary>
-        /// <param name="symbolCode">Symbol code, e.g. <c>"EURUSD"</c>.</param>
-        /// <param name="timeFrame">Timeframe code, e.g. <c>"M1"</c>, <c>"H1"</c>.</param>
-        /// <param name="ct">Cancel this token to close the stream gracefully.</param>
-        /// <remarks>Requires a plan with WebSocket support (<c>IsSocketSupport = true</c>).</remarks>
         IAsyncEnumerable<PriceTickerResult> StreamPriceAsync(
             string symbolCode,
             string timeFrame,
+            CancellationToken ct = default);
+
+        /// <summary>
+        /// Streams real-time OHLCV candle updates for a symbol.
+        /// <para>Endpoint: <c>wss://api.realmarketapi.com/candles</c></para>
+        /// </summary>
+        IAsyncEnumerable<PriceCandleResult> StreamCandlesAsync(
+            string symbolCode,
+            string timeFrame,
+            CancellationToken ct = default);
+
+        /// <summary>
+        /// Streams live order flow imbalance updates for a symbol. Requires PRO plan or above.
+        /// <para>Endpoint: <c>wss://api.realmarketapi.com/orderflow/imbalance</c></para>
+        /// </summary>
+        IAsyncEnumerable<OrderFlowImbalanceResult> StreamOrderFlowImbalanceAsync(
+            string symbolCode,
+            string timeFrame,
+            CancellationToken ct = default);
+
+        /// <summary>
+        /// Streams trend direction across all plan-allowed timeframes, pushed on any candle update. Requires PRO plan or above.
+        /// <para>Endpoint: <c>wss://api.realmarketapi.com/multi-timeframe</c></para>
+        /// </summary>
+        IAsyncEnumerable<MultiTimeframeResult> StreamMultiTimeframeAsync(
+            string symbolCode,
+            CancellationToken ct = default);
+
+        /// <summary>
+        /// Streams a full market snapshot pushed on every H1 tick for all plan symbols.
+        /// <para>Endpoint: <c>wss://api.realmarketapi.com/market</c></para>
+        /// </summary>
+        IAsyncEnumerable<List<PriceMarketResult>> StreamMarketAsync(
             CancellationToken ct = default);
     }
 }

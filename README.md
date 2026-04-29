@@ -1,6 +1,6 @@
 # RealMarketAPI.Sdk
 
-Official .NET SDK for the [RealMarket API](https://realmarketapi.com) — providing real-time market prices, OHLCV candles, historical data, technical indicators, WebSocket streaming, and MCP (Model Context Protocol) support.
+Official .NET SDK for the [RealMarket API](https://realmarketapi.com) — providing real-time market prices, OHLCV candles, historical data, technical indicators, WebSocket streaming, advanced market analysis (Insight, Liquidity, Order Flow, Stop Hunt, Anomaly, Manipulation), and MCP (Model Context Protocol) support.
 
 ![.NET](https://img.shields.io/badge/.NET-10.0-blueviolet)
 ![NuGet](https://img.shields.io/nuget/v/RealMarketAPI.Sdk)
@@ -118,9 +118,22 @@ public class MarketService(IRealMarketApiClient client)
 
     public async Task StreamPricesAsync(CancellationToken ct)
     {
-        // Real-time WebSocket streaming (requires WebSocket-enabled plan)
+        // Real-time price ticks (requires WebSocket-enabled plan)
         await foreach (var tick in client.WebSocket.StreamPriceAsync("EURUSD", "M1", ct))
-            Console.WriteLine($"[WS] {tick.OpenTime}: Close={tick.ClosePrice}");
+            Console.WriteLine($"[WS price] {tick.OpenTime}: Close={tick.ClosePrice}");
+
+        // Live order flow imbalance updates (PRO+)
+        await foreach (var imbalance in client.WebSocket.StreamOrderFlowImbalanceAsync("BTCUSD", "H1", ct))
+            Console.WriteLine($"[WS orderflow] {imbalance.CurrentImbalance}  Bull%: {imbalance.BullishRatio}");
+
+        // Live multi-timeframe trend updates (PRO+)
+        await foreach (var mtf in client.WebSocket.StreamMultiTimeframeAsync("EURUSD", ct))
+            foreach (var (tf, direction) in mtf.Timeframes)
+                Console.WriteLine($"[WS mtf] {tf}: {direction}");
+
+        // Full market snapshot on every H1 tick
+        await foreach (var market in client.WebSocket.StreamMarketAsync(ct))
+            Console.WriteLine($"[WS market] received {market.Count} symbols");
     }
 }
 ```
@@ -133,6 +146,8 @@ public class MarketService(IRealMarketApiClient client)
 |--------|-------------|
 | `GetPriceAsync(symbol, timeframe)` | Latest real-time ticker with bid/ask |
 | `GetMarketPricesAsync()` | Market overview for all plan symbols |
+| `GetPriceByCategoryAsync(category)` | Market prices filtered by category (`Forex`, `Crypto`, `Commodity`, `Equity`, `Stock`, `Index`) |
+| `Get24hrStatsAsync()` | 24-hour open/close/high/low/volume and change % per symbol |
 | `GetCandlesAsync(symbol, timeframe)` | Latest OHLCV candles |
 | `GetHistoryAsync(symbol, start, end, page, size)` | Paginated historical candle data |
 
@@ -153,6 +168,14 @@ public class MarketService(IRealMarketApiClient client)
 | `GetSupportResistanceAsync(symbol, timeframe)` | Support and resistance levels |
 | `GetFibonacciAsync(symbol, timeframe, lookback=100)` | Fibonacci retracement levels |
 | `GetSentimentAsync(symbol, timeframe)` | Market sentiment (trend, fear/greed score) |
+
+### Account (`client.Account`)
+
+| Method | Description |
+|--------|-------------|
+| `GetMeAsync()` | Plan code, request count/limit, usage %, allowed symbols & timeframes, WebSocket limits, historical range |
+
+> Does **not** consume your request quota.
 
 ### Symbols (`client.Symbols`)
 
@@ -218,17 +241,26 @@ public class MarketService(IRealMarketApiClient client)
 
 ### WebSocket (`client.WebSocket`)
 
-| Method | Description |
-|--------|-------------|
-| `StreamPriceAsync(symbol, timeframe, ct)` | Stream real-time price ticks as `IAsyncEnumerable<PriceTickerResult>` |
+| Method | Parameters | Plan | Description |
+|--------|-----------|------|-------------|
+| `StreamPriceAsync` | `symbol, timeframe, ct` | Socket-enabled | Real-time price ticks as `IAsyncEnumerable<PriceTickerResult>` |
+| `StreamCandlesAsync` | `symbol, timeframe, ct` | Socket-enabled | Real-time OHLCV candle updates |
+| `StreamOrderFlowImbalanceAsync` | `symbol, timeframe, ct` | PRO+ | Live order flow imbalance updates |
+| `StreamMultiTimeframeAsync` | `symbol, ct` | PRO+ | Trend direction across all timeframes, pushed on any candle update |
+| `StreamMarketAsync` | `ct` | Socket-enabled | Full market snapshot pushed on every H1 tick |
 
-> Requires a plan with WebSocket support enabled (`IsSocketSupport = true`).
-> Endpoint: `wss://api.realmarketapi.com/price`
+> Requires a plan with `IsSocketSupport = true`.  
+> PRO+ endpoints additionally require the PRO plan or above.  
+> Endpoints: `wss://api.realmarketapi.com/{price|candles|orderflow/imbalance|multi-timeframe|market}`
 
 ### MCP — Model Context Protocol (`client.Mcp`)
 
-Exposes the full RealMarket API as MCP tools, callable from AI assistants (GitHub Copilot, Claude, etc.) and from .NET code.
+Exposes the full RealMarket API as MCP tools, callable from AI assistants (GitHub Copilot, Claude, etc.) and from .NET code.  
 Endpoint: `https://api.realmarketapi.com/mcp`
+
+> **MCP calls do not consume your request quota.**
+
+#### Market Data & Indicators
 
 | Method | MCP Tool | Description |
 |--------|----------|-------------|
@@ -254,14 +286,33 @@ Endpoint: `https://api.realmarketapi.com/mcp`
 | `GetVolatilitySpikesAsync(symbol, timeframe, period=14, spikeMultiplier=2.0)` | `get_volatility_spikes` | Volatility spike candles |
 | `GetVolatilityHeatmapAsync(symbol, timeframe)` | `get_volatility_heatmap` | Day-of-Week × Hour-of-Day volatility heatmap |
 
-> Indicator MCP tools require a **Pro** plan or higher.  
+#### Advanced Analysis — *Pro plan required*
+
+| Method | MCP Tool | Description |
+|--------|----------|-------------|
+| `GetOrderFlowImbalanceAsync(symbol, timeframe)` | `get_orderflow_imbalance` | Bullish/bearish candle dominance + large-body imbalance zones |
+| `GetMultiTimeframeAsync(symbol)` | `get_multi_timeframe` | Trend direction across all available timeframes |
+| `GetStopHuntZonesAsync(symbol, timeframe)` | `get_stop_hunt_zones` | S/R levels likely targeted by stop runs |
+| `GetLiquidityZonesAsync(symbol, timeframe)` | `get_liquidity_zones` | Bid/ask liquidity clusters (swing high/low touch count) |
+| `GetAnomalyAsync(symbol, timeframe)` | `get_anomaly` | Price spike, unusual volume, and fake breakout detection |
+| `GetManipulationRiskAsync(symbol, timeframe)` | `get_manipulation_risk` | Manipulation risk score (0–100) with contributing factors |
+| `GetInsightScoreAsync(symbol, timeframe)` | `get_insight_score` | Composite bullish/bearish score (0–100) + label |
+| `GetInsightTrendAsync(symbol, timeframe)` | `get_insight_trend` | Trend direction, strength, and ADX momentum |
+| `GetInsightSetupAsync(symbol, timeframe)` | `get_insight_setup` | Market setup detection (Breakout / Pullback / Range) |
+| `GetInsightNextAsync(symbol, timeframe)` | `get_insight_next` | Next-candle forecast with bias and ATR-based targets |
+| `GetInsightConfluenceAsync(symbol, timeframe)` | `get_insight_confluence` | Per-indicator directional votes + confluence score |
+
+> Indicator and Advanced Analysis MCP tools require a **Pro** plan or higher.  
 > Volatility MCP tools require a **Starter** plan or higher.
 
 ## Notes
 
 - **Pro plan** required for: Indicator, Insight, Multi-Timeframe, Liquidity, Order Flow, Stop Hunt, Anomaly, and Manipulation endpoints.
 - **Starter plan** required for Volatility endpoints (Free plan not supported).
-- WebSocket streaming requires a plan with `IsSocketSupport = true`.
+- WebSocket streaming requires a plan with `IsSocketSupport = true`. PRO+ endpoints additionally require the PRO plan.
+- **MCP calls do not consume your request quota** — they are treated as tooling/agent access.
+- **Market-aware quota**: REST requests for symbols whose market is currently closed do not count against your monthly quota.
 - Historical data availability depends on your plan's `HistoricalRangeMonth`.
+- `GET /me` (`client.Account.GetMeAsync()`) does not consume your request quota.
 - All methods accept an optional `CancellationToken`.
 - Targets **.NET 10**.

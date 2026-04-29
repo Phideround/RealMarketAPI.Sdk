@@ -16,6 +16,9 @@ namespace RealTimeMarketAPI.Sdk
         /// <summary>Access available trading symbols via REST.</summary>
         ISymbolClient Symbols { get; }
 
+        /// <summary>Access account and plan information.</summary>
+        IAccountClient Account { get; }
+
         /// <summary>Access volatility metrics, spike detection, and heatmap via REST.</summary>
         IVolatilityClient Volatility { get; }
 

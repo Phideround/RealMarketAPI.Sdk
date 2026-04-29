@@ -23,6 +23,19 @@ namespace RealTimeMarketAPI.Sdk.Clients
         Task<ListResult<PriceMarketResult>> GetMarketPricesAsync(CancellationToken ct = default);
 
         /// <summary>
+        /// Gets market prices filtered by asset category.
+        /// <para>Endpoint: GET /api/v1/price/category</para>
+        /// </summary>
+        /// <param name="category">Category name: <c>Forex</c>, <c>Crypto</c>, <c>Commodity</c>, <c>Equity</c>, <c>Stock</c>, or <c>Index</c>.</param>
+        Task<ListResult<PriceMarketResult>> GetPriceByCategoryAsync(string category, CancellationToken ct = default);
+
+        /// <summary>
+        /// Gets 24-hour price statistics (open, close, high, low, volume, change %) for all plan symbols.
+        /// <para>Endpoint: GET /api/v1/price/24hr</para>
+        /// </summary>
+        Task<ListResult<Price24hrResult>> Get24hrStatsAsync(CancellationToken ct = default);
+
+        /// <summary>
         /// Gets the latest OHLCV candles for a symbol and timeframe.
         /// <para>Endpoint: GET /api/v1/candle</para>
         /// </summary>

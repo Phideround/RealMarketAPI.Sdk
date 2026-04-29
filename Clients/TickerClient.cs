@@ -37,6 +37,29 @@ namespace RealTimeMarketAPI.Sdk.Clients
             return result!;
         }
 
+        public async Task<ListResult<PriceMarketResult>> GetPriceByCategoryAsync(string category, CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey,
+                ["category"] = category
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<PriceMarketResult>>($"api/v1/price/category?{query}", JsonOptions, ct);
+            return result!;
+        }
+
+        public async Task<ListResult<Price24hrResult>> Get24hrStatsAsync(CancellationToken ct = default)
+        {
+            var query = QueryBuilder.Build(new Dictionary<string, string>
+            {
+                ["apiKey"] = apiKey
+            });
+
+            var result = await httpClient.GetFromJsonAsync<ListResult<Price24hrResult>>($"api/v1/price/24hr?{query}", JsonOptions, ct);
+            return result!;
+        }
+
         public async Task<ListResult<PriceCandleResult>> GetCandlesAsync(string symbolCode, string timeFrame, CancellationToken ct = default)
         {
             var query = QueryBuilder.Build(new Dictionary<string, string>

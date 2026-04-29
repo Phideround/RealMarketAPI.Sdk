@@ -1,4 +1,6 @@
 using RealTimeMarketAPI.Sdk.Internal;
+using RealTimeMarketAPI.Sdk.Models.MultiTimeframe;
+using RealTimeMarketAPI.Sdk.Models.OrderFlow;
 using RealTimeMarketAPI.Sdk.Models.Ticker;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
@@ -13,14 +15,31 @@ namespace RealTimeMarketAPI.Sdk.Clients
             PropertyNameCaseInsensitive = true
         };
 
-        public async IAsyncEnumerable<PriceTickerResult> StreamPriceAsync(
-            string symbolCode,
-            string timeFrame,
-            [EnumeratorCancellation] CancellationToken ct = default)
-        {
-            var uri = BuildUri(symbolCode, timeFrame);
-            using var ws = new ClientWebSocket();
+        public IAsyncEnumerable<PriceTickerResult> StreamPriceAsync(
+            string symbolCode, string timeFrame, CancellationToken ct = default)
+            => StreamAsync<PriceTickerResult>(BuildUri("price", symbolCode, timeFrame), ct);
 
+        public IAsyncEnumerable<PriceCandleResult> StreamCandlesAsync(
+            string symbolCode, string timeFrame, CancellationToken ct = default)
+            => StreamAsync<PriceCandleResult>(BuildUri("candles", symbolCode, timeFrame), ct);
+
+        public IAsyncEnumerable<OrderFlowImbalanceResult> StreamOrderFlowImbalanceAsync(
+            string symbolCode, string timeFrame, CancellationToken ct = default)
+            => StreamAsync<OrderFlowImbalanceResult>(BuildUri("orderflow/imbalance", symbolCode, timeFrame), ct);
+
+        public IAsyncEnumerable<MultiTimeframeResult> StreamMultiTimeframeAsync(
+            string symbolCode, CancellationToken ct = default)
+            => StreamAsync<MultiTimeframeResult>(BuildUri("multi-timeframe", symbolCode, null), ct);
+
+        public IAsyncEnumerable<List<PriceMarketResult>> StreamMarketAsync(
+            CancellationToken ct = default)
+            => StreamAsync<List<PriceMarketResult>>(BuildUri("market", null, null), ct);
+
+        private async IAsyncEnumerable<T> StreamAsync<T>(
+            Uri uri,
+            [EnumeratorCancellation] CancellationToken ct)
+        {
+            using var ws = new ClientWebSocket();
             await ws.ConnectAsync(uri, ct);
 
             var buffer = new byte[8192];
@@ -52,10 +71,10 @@ namespace RealTimeMarketAPI.Sdk.Clients
                         if (serverClosed) break;
 
                         ms.Position = 0;
-                        var ticker = await JsonSerializer.DeserializeAsync<PriceTickerResult>(ms, JsonOptions, ct);
+                        var item = await JsonSerializer.DeserializeAsync<T>(ms, JsonOptions, ct);
 
-                        if (ticker is not null)
-                            yield return ticker;
+                        if (item is not null)
+                            yield return item;
                     }
                     finally
                     {
@@ -75,7 +94,7 @@ namespace RealTimeMarketAPI.Sdk.Clients
             }
         }
 
-        private Uri BuildUri(string symbolCode, string timeFrame)
+        private Uri BuildUri(string path, string? symbolCode, string? timeFrame)
         {
             var baseUri = new Uri(options.BaseUrl);
             var scheme = baseUri.Scheme == "https" ? "wss" : "ws";
@@ -83,14 +102,12 @@ namespace RealTimeMarketAPI.Sdk.Clients
                 ? baseUri.Host
                 : $"{baseUri.Host}:{baseUri.Port}";
 
-            var query = QueryBuilder.Build(new Dictionary<string, string>
-            {
-                ["apiKey"] = options.ApiKey,
-                ["symbolCode"] = symbolCode,
-                ["timeFrame"] = timeFrame
-            });
+            var parameters = new Dictionary<string, string> { ["apiKey"] = options.ApiKey };
+            if (symbolCode is not null) parameters["symbolCode"] = symbolCode;
+            if (timeFrame is not null) parameters["timeFrame"] = timeFrame;
 
-            return new Uri($"{scheme}://{host}/price?{query}");
+            var query = QueryBuilder.Build(parameters);
+            return new Uri($"{scheme}://{host}/{path}?{query}");
         }
     }
 }
