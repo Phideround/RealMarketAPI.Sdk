@@ -55,5 +55,20 @@ namespace RealTimeMarketAPI.Sdk
 
         /// <summary>Access Manipulation Risk module — assesses manipulation probability from wick ratio, volume divergence, and fake breakouts.</summary>
         IManipulationClient Manipulation { get; }
+
+        /// <summary>Access Alerts module — create, list, and delete alert rules.</summary>
+        IAlertClient Alerts { get; }
+
+        /// <summary>Access Screener module — query symbols by trend, volatility, momentum, and liquidity filters.</summary>
+        IScreenerClient Screener { get; }
+
+        /// <summary>Access Strategy Signal module — get composite strategy signals with confidence and risk metadata.</summary>
+        IStrategySignalClient StrategySignal { get; }
+
+        /// <summary>Access Watchlist module — create and manage cloud watchlists.</summary>
+        IWatchlistClient Watchlist { get; }
+
+        /// <summary>Access Market Calendar module — retrieve sessions and high-impact event metadata.</summary>
+        IMarketCalendarClient MarketCalendar { get; }
     }
 }

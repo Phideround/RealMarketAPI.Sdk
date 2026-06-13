@@ -49,5 +49,20 @@ namespace RealTimeMarketAPI.Sdk
 
         /// <inheritdoc/>
         public IManipulationClient Manipulation { get; } = new ManipulationClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IAlertClient Alerts { get; } = new AlertClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IScreenerClient Screener { get; } = new ScreenerClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IStrategySignalClient StrategySignal { get; } = new StrategySignalClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IWatchlistClient Watchlist { get; } = new WatchlistClient(httpClient, options.ApiKey);
+
+        /// <inheritdoc/>
+        public IMarketCalendarClient MarketCalendar { get; } = new MarketCalendarClient(httpClient, options.ApiKey);
     }
 }

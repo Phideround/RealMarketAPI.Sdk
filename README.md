@@ -239,6 +239,41 @@ public class MarketService(IRealMarketApiClient client)
 |--------|-------------|
 | `GetRiskAsync(symbol, timeframe)` | Composite manipulation risk score (0–100) from wick ratio, volume divergence, and fake breakouts |
 
+### Alerts (`client.Alerts`)
+
+| Method | Description |
+|--------|-------------|
+| `CreateAsync(request)` | Create a new alert rule |
+| `GetAsync(status?)` | List alert rules, optionally filtered by status |
+| `DeleteAsync(alertId)` | Delete an alert rule |
+
+### Screener (`client.Screener`)
+
+| Method | Description |
+|--------|-------------|
+| `QueryAsync(request)` | Query symbols by trend/volatility/momentum/liquidity filters |
+
+### Strategy Signal (`client.StrategySignal`)
+
+| Method | Description |
+|--------|-------------|
+| `GetAsync(symbol, timeframe)` | Composite strategy signal with confidence, risk level, and invalidation price |
+
+### Watchlist (`client.Watchlist`)
+
+| Method | Description |
+|--------|-------------|
+| `CreateAsync(request)` | Create a cloud watchlist |
+| `GetAsync()` | List cloud watchlists |
+| `AddItemAsync(watchlistId, request)` | Add a symbol to a watchlist |
+| `RemoveItemAsync(watchlistId, symbolCode)` | Remove a symbol from a watchlist |
+
+### Market Calendar (`client.MarketCalendar`)
+
+| Method | Description |
+|--------|-------------|
+| `GetAsync(date?, timezone="UTC")` | Retrieve sessions and high-impact events metadata |
+
 ### WebSocket (`client.WebSocket`)
 
 | Method | Parameters | Plan | Description |
